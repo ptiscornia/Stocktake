@@ -1,12 +1,38 @@
 
 ## Style
-style_conditional <- createStyle(fontSize = 12, border = "TopBottomLeftRight", borderStyle = "thick", 
+style_conditional_01 <- createStyle(fontSize = 12, border = "TopBottomLeftRight", borderStyle = "thick", 
                                  textDecoration = "bold", 
-                                 fgFill = ifelse(text_on_off_track == "On track", c40_colors("green"), 
-                                                 ifelse(text_on_off_track == "NEEDS IMPROVING", c40_colors("yellow"),
-                                                        ifelse(text_on_off_track == "NEED DEFINITION", c40_colors("violet"),
-                                                               c40_colors("red")))),
+                                 fgFill = ifelse(text_track_emissions_d2020pc == "On track", c40_colors("green"), 
+                                                 ifelse(text_track_emissions_d2020pc == "N/A", "grey",
+                                                        ifelse(text_track_emissions_d2020pc == "Off track", c40_colors("red"),
+                                                               "yellow"))),
                                  wrapText = TRUE, valign = "center", halign = "center")
+
+## Style
+style_conditional_02 <- createStyle(fontSize = 12, border = "TopBottomLeftRight", borderStyle = "thick", 
+                                    textDecoration = "bold", 
+                                    fgFill = ifelse(text_track_2024_updated_target == "On track", c40_colors("green"), 
+                                                    ifelse(text_track_2024_updated_target == "N/A", "grey",
+                                                           ifelse(text_track_2024_updated_target == "Off track", c40_colors("red"),
+                                                                  "yellow"))),
+                                    wrapText = TRUE, valign = "center", halign = "center")
+
+style_conditional_03 <- createStyle(fontSize = 12, border = "TopBottomLeftRight", borderStyle = "thick", 
+                                    textDecoration = "bold", 
+                                    fgFill = ifelse(text_track_2024_adjusted_target == "On track", c40_colors("green"), 
+                                                    ifelse(text_track_2024_adjusted_target == "N/A", "grey",
+                                                           ifelse(text_track_2024_adjusted_target == "Off track", c40_colors("red"),
+                                                                  "yellow"))),
+                                    wrapText = TRUE, valign = "center", halign = "center")
+
+style_conditional_04 <- createStyle(fontSize = 12, border = "TopBottomLeftRight", borderStyle = "thick", 
+                                    textDecoration = "bold", 
+                                    fgFill = ifelse(text_track_gral_compliance == "On track", c40_colors("green"), 
+                                                    ifelse(text_track_gral_compliance == "N/A", "grey",
+                                                           ifelse(text_track_gral_compliance == "At risck", c40_colors("yellow"),
+                                                                  "yellow"))),
+                                    wrapText = TRUE, valign = "center", halign = "center")
+
 
 ### Power column styling
 style_table_hia_strong <- createStyle(fontSize = 12, border = "TopBottomLeftRight", borderStyle = "thin", textDecoration = NULL, 

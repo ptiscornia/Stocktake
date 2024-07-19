@@ -3,7 +3,8 @@ source("R/00-libraries.R")
 source("R/01-extrac.R")
 source("R/02-transform.R")
 
-version <- "v0.2"
+version <- "v0.4"
+
 ### Excel creation
 wb <- createWorkbook()
 #options("openxlsx.borderColour" = "#4F80BD")
@@ -15,8 +16,18 @@ for (i in seq_along(sort(unique(table_hia_powers$City)))) {
   
   #text_city <- sort(unique(df_hia_powers$city))[1:13][i]
   text_city <- sort(unique(table_hia_powers$City))[i]
-  #text_on_off_track <- "On track"
-  text_on_off_track <- "NEED DEFINITION"
+  
+  text_track_emissions_d2020pc <- df_hia_tracking_status |> 
+    filter(city == text_city) |>  pull(emissions_below_d2020_per_capita_y_n)
+  
+  text_track_2024_updated_target <- df_hia_tracking_status |> 
+    filter(city == text_city) |>  pull(on_track_with_2024_hia_updated_target_y_n)
+  
+  text_track_2024_adjusted_target <- df_hia_tracking_status |> 
+    filter(city == text_city) |>  pull(on_track_with_2024_hia_power_adjusted_target_y_n)
+  
+  text_track_gral_compliance <- df_hia_tracking_status |> 
+    filter(city == text_city) |>  pull(general_compliance_assessment)
   
   ### Add sheet
   addWorksheet(wb, sheetName = text_city, gridLines = FALSE)
@@ -44,9 +55,9 @@ for (i in seq_along(sort(unique(table_hia_powers$City)))) {
   mergeCells(wb, i, cols = 4:7, rows = 5)
   addStyle(wb, i, style = style2, cols = 4:7, rows = 5, stack = FALSE, gridExpand = TRUE)
   
-  writeData(wb, i, startCol = "J", startRow = 5, x = text_on_off_track)
+  writeData(wb, i, startCol = "J", startRow = 5, x = text_track_gral_compliance)
   mergeCells(wb, i, cols = 10:15, rows = 5)
-  addStyle(wb, i, style = style_conditional, cols = 10:15, rows = 5, stack = FALSE, gridExpand = TRUE)
+  addStyle(wb, i, style = style_conditional_04, cols = 10:15, rows = 5, stack = FALSE, gridExpand = TRUE)
   
   writeData(wb, i, startCol = "B", startRow = 7, x = "Alignment with the city's 2030 climate targets | GHG emissions and Climate Action Implementation")
   mergeCells(wb, i, cols = 2:15, rows = 7)
@@ -61,8 +72,8 @@ for (i in seq_along(sort(unique(table_hia_powers$City)))) {
   writeData(wb, i, startCol = "G", startRow = 9, x = "Status")
   addStyle(wb, i, style = style3, cols = "G", rows = 9, stack = FALSE)
   
-  writeData(wb, i, startCol = "G", startRow = 10, x = text_on_off_track)
-  addStyle(wb, i, style = style_conditional, cols = "G", rows = 10, stack = FALSE, gridExpand = TRUE)
+  writeData(wb, i, startCol = "G", startRow = 10, x = text_track_emissions_d2020pc)
+  addStyle(wb, i, style = style_conditional_01, cols = "G", rows = 10, stack = FALSE, gridExpand = TRUE)
   
   ### GRAPH
   img_path <- paste0("/Users/pablotiscornia/Library/CloudStorage/GoogleDrive-ptiscornia@c40.org/Shared drives/BPMI/Business Planning and Reporting/C40 Analytics Team/Leadership Standards/GHG Forecasts/plots-forecasts-trends/")
@@ -74,31 +85,32 @@ for (i in seq_along(sort(unique(table_hia_powers$City)))) {
   
   
   # Title
-  writeData(wb, i, startCol = "J", startRow = 9, x = "Climate Action against D2020 target")
-  addStyle(wb, i, style = style3, cols = "K", rows = 9, stack = FALSE)
+  writeData(wb, i, startCol = "J", startRow = 9, x = "Climate action implementation (%)")
+  addStyle(wb, i, style = style3, cols = "J", rows = 9, stack = FALSE)
   
-  writeData(wb, i, startCol = "N", startRow = 9, x = "Status")
+  writeData(wb, i, startCol = "N", startRow = 9, x = "Status - 2024 target")
   addStyle(wb, i, style = style3, cols = "N", rows = 9, stack = FALSE)
   
-  writeData(wb, i, startCol = "N", startRow = 10, x = text_on_off_track)
-  addStyle(wb, i, style = style_conditional, cols = "N", rows = 10, stack = FALSE, gridExpand = TRUE)
+  writeData(wb, i, startCol = "N", startRow = 10, x = text_track_2024_updated_target)
+  addStyle(wb, i, style = style_conditional_02, cols = "N", rows = 10, stack = FALSE, gridExpand = TRUE)
+  
+  writeData(wb, i, startCol = "N", startRow = 12, x = "Status - 2024 power adjusted target")
+  addStyle(wb, i, style = style3, cols = "N", rows = 12, stack = FALSE)
+  
+  writeData(wb, i, startCol = "N", startRow = 13, x = text_track_2024_adjusted_target)
+  addStyle(wb, i, style = style_conditional_03, cols = "N", rows = 13, stack = FALSE, gridExpand = TRUE)
   
   ### GRAPH
   img_file <- list.files(path = "output_viz_arcbar/", pattern = substr(text_city, 1,5))
   
-  insertImage(wb, i, file = glue::glue("output_viz_arcbar//{img_file}"),
+  insertImage(wb, i, file = glue::glue("output_viz_arcbar/{img_file}"),
               startRow = 10,  startCol = 10,
-              width = 3, height = 3, units = "in")
+              width = 4, height = 4, units = "in")
   
   
   writeData(wb, i, startCol = "B", startRow = 18, x = "[PLACEHOLDER - ADAPTATION OUTCOMES SNAPSHOT]")
   mergeCells(wb, i, cols = 2:6, rows = 18)
   addStyle(wb, i, style = style9, cols = 2:6, rows = 18, stack = FALSE, gridExpand = TRUE)
-  
-  writeData(wb, i, startCol = "J", startRow = 18, x = "[PLACEHOLDER - CAP Implementation considerations (not captured in the HIAs)")
-  mergeCells(wb, i, cols = 10:13, rows = 18)
-  addStyle(wb, i, style = style9, cols = 10:13, rows = 18, stack = FALSE, gridExpand = TRUE)
-  
   
   writeData(wb, i, startCol = "B", startRow = 20, x = "Climate Action implementation | Assessment of Powers & Barriers")
   mergeCells(wb, i, cols = 2:15, rows = 20)
@@ -109,47 +121,75 @@ for (i in seq_along(sort(unique(table_hia_powers$City)))) {
   addStyle(wb, i, style = style9, cols = 2:15, rows = 22, stack = FALSE, gridExpand = TRUE)
   
   ### Summary table
-  writeData(wb, i, startCol = "B", startRow = 24, x = "Summary (see Annex for a detailed list of actions accounted for)")
+  writeData(wb, i, startCol = "B", startRow = 24, x = "Powers per sector (see Annex for a detailed list of actions accounted for)")
+  addStyle(wb, i, style = style3, cols = 2:6, rows = 24, stack = FALSE, gridExpand = TRUE)
+  mergeCells(wb, i, cols = 2:6, rows = 24)
+  
+  writeData(wb, i, startCol = "H", startRow = 24, x = "Barriers")
+  mergeCells(wb, i, cols = 8:15, rows = 24)
+  addStyle(wb, i, style = style3, cols = 8:15, rows = 24, stack = FALSE, gridExpand = TRUE)
+  
+  writeData(wb, i, startCol = "H", startRow = 25, x = "Barrier Category")
+  mergeCells(wb, i, cols = 8, rows = 25:26)
+  addStyle(wb, i, style = style7, cols = 8, rows = 25:26, stack = FALSE, gridExpand = TRUE)
+  
+  writeData(wb, i, startCol = "I", startRow = 25, x = "Barrier Description")
+  mergeCells(wb, i, cols = 9:14, rows = 25:26)
+  addStyle(wb, i, style = style7, cols = 9:14, rows = 25:26, stack = FALSE, gridExpand = TRUE)
+  
+  writeData(wb, i, startCol = "O", startRow = 25, x = "Any usefull link?")
+  mergeCells(wb, i, cols = 15, rows = 25:26)
+  addStyle(wb, i, style = style7, cols = 15, rows = 25:26, stack = FALSE, gridExpand = TRUE)
   
   ### HIA Powers Table
   ### Write HIA action's table
-  for (n_col in seq_along(colnames(table_hia_powers |> select(-City)))) {
+  df_powers <- table_hia_powers |> 
+    select("#", City, Sector, Implemented, Progressing, Powers)
+  
+  for (n_col in seq_along(colnames(df_powers |> select(-City)))) {
     
-    temp_df <- table_hia_powers |> select(-City)
+    temp_df <- df_powers |> select(-City)
+    
+    columns <- LETTERS[2:6]
     
     # Write Column's names
     writeData(wb, i, startCol = columns[n_col], startRow = 26, 
               x = colnames(temp_df)[n_col])
     
     # Write Data
-    columns <- LETTERS[2:15]
     writeData(wb, i, startCol = columns[n_col], startRow = 27, 
-              x = table_hia_powers |> 
+              x = df_powers |> 
                 filter(City == text_city) |> 
                 select(-City) |> 
                 select(colnames(temp_df[n_col])) |> 
                 pull())
   }
   
-  for (n_row2 in 26:35) {
-    mergeCells(wb, i, cols = 8:10, rows = n_row2)
-    mergeCells(wb, i, cols = 11:15, rows = n_row2)
-  }
+  # for (n_row2 in 26:35) {
+  #   mergeCells(wb, i, cols = 8:10, rows = n_row2)
+  #   mergeCells(wb, i, cols = 11:15, rows = n_row2)
+  # }
   
-  addStyle(wb, i, style = style10, cols = c(2:15), rows = 27:35, stack = TRUE, gridExpand = TRUE)
-  conditionalFormatting(wb, i, style = style_table_hia_strong, cols = c(2:15), rows = 27:35, type = "contains", rule = "Strong")
-  conditionalFormatting(wb, i, style = style_table_hia_partial, cols = c(2:15), rows = 27:35, type = "contains", rule = "Partial")
+  addStyle(wb, i, style = style10, cols = 2:6, rows = 27:35, stack = TRUE, gridExpand = TRUE)
+  addStyle(wb, i, style = style10, cols = 8:15, rows = 27:35, stack = TRUE, gridExpand = TRUE)
   
-  conditionalFormatting(wb, i, style = style_table_hia_significant, cols = c(2:15), rows = 27:35, type = "contains", rule = "Significant")
-  conditionalFormatting(wb, i, style = style_table_hia_some, cols = c(2:15), rows = 27:35, type = "contains", rule = "Some")
+  conditionalFormatting(wb, i, style = style_table_hia_strong, cols = c(2:6), rows = 27:35, type = "contains", rule = "Strong")
+  conditionalFormatting(wb, i, style = style_table_hia_partial, cols = c(2:6), rows = 27:35, type = "contains", rule = "Partial")
+  
+  #conditionalFormatting(wb, i, style = style_table_hia_significant, cols = c(2:15), rows = 27:35, type = "contains", rule = "Significant")
+  #conditionalFormatting(wb, i, style = style_table_hia_some, cols = c(2:15), rows = 27:35, type = "contains", rule = "Some")
   
   writeData(wb, i, startCol = "D", startRow = 25, x = "Climate policies")
   mergeCells(wb, i, cols = 4:6, rows = 25)
   
-  writeData(wb, i, startCol = "H", startRow = 25, x = "Barriers")
-  mergeCells(wb, i, cols = 8:15, rows = 25)
+  # writeData(wb, i, startCol = "H", startRow = 25, x = "Barrier Category")
+  # mergeCells(wb, i, cols = 8, rows = 25:26)
   
-  addStyle(wb, i, style = style7, cols = 2:15, rows = 25:26, stack = FALSE, gridExpand = TRUE)
+  # writeData(wb, i, startCol = "I", startRow = 25, x = "Barrier Descriptio")
+  # mergeCells(wb, i, cols = 8:14, rows = 25:26)
+  
+  addStyle(wb, i, style = style7, cols = 2:6, rows = 25:26, stack = FALSE, gridExpand = TRUE)
+  #addStyle(wb, i, style = style7, cols = 8:9, rows = 25:26, stack = FALSE, gridExpand = TRUE)
   
   
   writeData(wb, i, startCol = "B", startRow = 37, x = "CONCLUSION | Can the city get on track into a 1.5C trajectory if given the right support? ")
@@ -200,5 +240,6 @@ for (i in seq_along(sort(unique(table_hia_powers$City)))) {
 } 
 
 ### Write excel file
-saveWorkbook(wb, glue::glue("output_stocktake/City Report Automation_{version}.xlsx"), returnValue = TRUE, overwrite = TRUE) ## save to working directory
+saveWorkbook(wb, glue::glue("output_stocktake/City Report Automation_{version}.xlsx"), 
+             returnValue = TRUE, overwrite = TRUE) ## save to working directory
 

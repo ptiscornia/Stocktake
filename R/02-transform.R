@@ -103,5 +103,3 @@ table_hia_actions <- df_hia_actions_orig |>
   relocate(column_l, .after = column_k) 
   
 
-
-
